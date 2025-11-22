@@ -127,14 +127,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const type = cardTypeSelect.value;
     cardBankSelect.innerHTML = "<option value=''>Select...</option>";
     if (type === "Debit") {
-      ["SBI 2256", "HDFC 1478"].forEach((b) => {
+      ["SBI 8581", "HDFC 2084"].forEach((b) => {
         const opt = document.createElement("option");
         opt.value = b;
         opt.textContent = b;
         cardBankSelect.appendChild(opt);
       });
     } else if (type === "Credit") {
-      ["HDFC 7777", "HDFC 8888"].forEach((b) => {
+      ["HDFC 2378 (Swiggy)", "HDFC 4545 (MoneyBack)"].forEach((b) => {
         const opt = document.createElement("option");
         opt.value = b;
         opt.textContent = b;
@@ -161,14 +161,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const type = bulkCardTypeSelect.value;
     bulkCardBankSelect.innerHTML = "<option value=''>Select...</option>";
     if (type === "Debit") {
-      ["SBI 2256", "HDFC 1478"].forEach((b) => {
+      ["SBI 8581", "HDFC 2084"].forEach((b) => {
         const opt = document.createElement("option");
         opt.value = b;
         opt.textContent = b;
         bulkCardBankSelect.appendChild(opt);
       });
     } else if (type === "Credit") {
-      ["HDFC 7777", "HDFC 8888"].forEach((b) => {
+      ["HDFC 2378 (Swiggy)", "HDFC 4545 (MoneyBack)"].forEach((b) => {
         const opt = document.createElement("option");
         opt.value = b;
         opt.textContent = b;
