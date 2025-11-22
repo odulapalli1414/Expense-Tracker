@@ -4,6 +4,7 @@ import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime, date, timedelta, timezone
 from werkzeug.utils import secure_filename
+import json
 
 try:
     from zoneinfo import ZoneInfo  # Python 3.9+
@@ -12,7 +13,11 @@ except ImportError:
 
 # ================== CONFIG ==================
 
-SERVICE_ACCOUNT_FILE = "service_account.json"  # your JSON key
+# SERVICE_ACCOUNT_FILE = "service_account.json"  # your JSON key
+# creds = Credentials.from_service_account_file(
+#     SERVICE_ACCOUNT_FILE, scopes=SCOPES
+# )
+
 SPREADSHEET_ID = "1KVjWa9t0PreTec_EiF6-XXf1nxJ5CLYmGJ7QDGz844Q"  # your sheet id
 
 EXPENSES_SHEET_NAME = "Expenses"
@@ -21,9 +26,16 @@ INCOME_SHEET_NAME = "Income"
 TIMEZONE_NAME = "Asia/Kolkata"  # will fallback to +5:30 if not found
 
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
-creds = Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES
+
+
+service_json = os.environ["SERVICE_ACCOUNT_JSON"]
+creds_dict = json.loads(service_json)
+
+creds = Credentials.from_service_account_info(
+    creds_dict,
+    scopes=SCOPES
 )
+
 client = gspread.authorize(creds)
 
 expenses_sheet = client.open_by_key(SPREADSHEET_ID).worksheet(EXPENSES_SHEET_NAME)
