@@ -1,305 +1,302 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>Expense & Income Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='app.css') }}"
-    />
-  </head>
-  <body>
-    <div class="card">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Expense & Income Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}" />
+  <style>
+    .nav-buttons {
+      display: flex;
+      gap: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+
+    <!-- TOP NAV -->
+    <div class="top-nav">
       <h1>Money Tracker</h1>
-      <div class="subtitle">Log expenses & income to Google Sheets.</div>
-
-      <!-- Expense vs Income toggle -->
-      <div class="section-title">Type</div>
-      <div class="toggle-group" id="typeToggle">
-        <div class="toggle-option active" data-type="expense">Expense</div>
-        <div class="toggle-option" data-type="income">Income</div>
+      <div class="nav-buttons">
+        <a href="/dashboard" class="nav-btn">📊 Dashboard</a>
+        <a href="/records" class="nav-btn">📋 View Records</a>
       </div>
+    </div>
+    <div class="subtitle">Log expenses & income to track your finances.</div>
 
-      <form
-        id="expense-form"
-        enctype="multipart/form-data"
-        method="post"
-        action="/add"
-      >
-        <input type="hidden" name="entryType" id="entryType" value="expense" />
-        <input type="hidden" name="entryMode" id="entryMode" value="single" />
+    <!-- Expense vs Income toggle -->
+    <div class="section-title">Type</div>
+    <div class="toggle-group" id="typeToggle">
+      <div class="toggle-option active" data-type="expense">Expense</div>
+      <div class="toggle-option" data-type="income">Income</div>
+    </div>
 
-        <!-- ================= EXPENSE SECTION ================= -->
-        <div id="expenseWrapper">
-          <!-- Single vs Bulk toggle -->
-          <div class="section-title">Mode</div>
-          <div class="toggle-group" id="modeToggle">
-            <div class="toggle-option active" data-mode="single">Single</div>
-            <div class="toggle-option" data-mode="bulk">Bulk</div>
-          </div>
+    <form id="expense-form" enctype="multipart/form-data" method="post" action="/add">
+      <input type="hidden" name="entryType" id="entryType" value="expense" />
+      <input type="hidden" name="entryMode" id="entryMode" value="single" />
 
-          <!-- SINGLE EXPENSE SECTION -->
-          <div id="singleSection">
-            <label>Item<span class="required">*</span></label>
-            <input
-              type="text"
-              name="item"
-              placeholder="Coffee, Uber, Swiggy..."
-            />
-
-            <label>Category<span class="required">*</span></label>
-            <select name="category" id="category">
-              <option value="">Select...</option>
-              <option value="Bills">Bills</option>
-              <option value="Subscriptions">Subscriptions</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Food & Drink">Food & Drink</option>
-              <option value="Groceries">Groceries</option>
-              <option value="Health & Wellbeing">Health & Wellbeing</option>
-              <option value="Other">Other</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Transport">Transport</option>
-              <option value="Travel">Travel</option>
-              <option value="Business">Business</option>
-              <option value="Gifts">Gifts</option>
-            </select>
-
-            <label>Amount<span class="required">*</span></label>
-            <input type="text" id="amountDisplay" placeholder="1,234" />
-            <input type="hidden" name="amount" id="amount" />
-
-            <label>Payment Mode<span class="required">*</span></label>
-            <select name="paymentMode" id="paymentMode">
-              <option value="">Select...</option>
-              <option value="Cash">Cash</option>
-              <option value="Card">Card</option>
-              <option value="UPI">UPI</option>
-            </select>
-
-            <div id="cardFields" class="hidden">
-              <div class="row">
-                <div>
-                  <label>Card Type<span class="required">*</span></label>
-                  <select name="cardType" id="cardType">
-                    <option value="">Select...</option>
-                    <option value="Credit">Credit</option>
-                    <option value="Debit">Debit</option>
-                  </select>
-                </div>
-                <div>
-                  <label>Bank<span class="required">*</span></label>
-                  <select name="cardBankName" id="cardBankName">
-                    <option value="">Select...</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div id="upiFields" class="hidden">
-              <div class="row">
-                <div>
-                  <label>UPI Provider<span class="required">*</span></label>
-                  <select name="upiProvider" id="upiProvider">
-                    <option value="">Select...</option>
-                    <option value="GPay">GPay</option>
-                    <option value="PhonePe">PhonePe</option>
-                    <option value="Paytm">Paytm</option>
-                    <option value="Others">Others</option>
-                  </select>
-                </div>
-                <div>
-                  <label>Bank<span class="required">*</span></label>
-                  <select name="upiBankName" id="upiBankName">
-                    <option value="">Select...</option>
-                    <option value="SBI 1234">SBI 1234</option>
-                    <option value="HDFC 4563">HDFC 4563</option>
-                    <option value="ICICI 7890">ICICI 7890</option>
-                    <option value="Axis 1122">Axis 1122</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
-              <div class="row">
-                <div>
-                  <label>Card Type<span class="required">*</span></label>
-                  <select name="upiCardType" id="upiCardType">
-                    <option value="">Select...</option>
-                    <option value="Credit">Credit</option>
-                    <option value="Debit">Debit</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <label>
-              Purchase Date
-              <span class="info-icon">i
-                <span class="tooltip">
-                  This is the date when money was debited.<br /><br />
-                  If you leave it empty, it will use today's date (same as
-                  timestamp date) and store it as:<br />
-                  <strong>1, Jan, 2026</strong>
-                </span>
-              </span>
-            </label>
-            <input type="date" name="purchaseDate" />
-
-            <label>Remarks</label>
-            <input type="text" name="remarks" placeholder="Optional notes..." />
-          </div>
-
-          <!-- BULK EXPENSE SECTION -->
-          <div id="bulkSection" class="hidden">
-            <div class="section-title">Bulk Common Fields</div>
-
-            <label>Payment Mode<span class="required">*</span></label>
-            <select name="bulkPaymentMode" id="bulkPaymentMode">
-              <option value="">Select...</option>
-              <option value="Cash">Cash</option>
-              <option value="Card">Card</option>
-              <option value="UPI">UPI</option>
-            </select>
-
-            <div id="bulkCardFields" class="hidden">
-              <div class="row">
-                <div>
-                  <label>Card Type<span class="required">*</span></label>
-                  <select name="bulkCardType" id="bulkCardType">
-                    <option value="">Select...</option>
-                    <option value="Credit">Credit</option>
-                    <option value="Debit">Debit</option>
-                  </select>
-                </div>
-                <div>
-                  <label>Bank<span class="required">*</span></label>
-                  <select name="bulkCardBankName" id="bulkCardBankName">
-                    <option value="">Select...</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div id="bulkUpiFields" class="hidden">
-              <div class="row">
-                <div>
-                  <label>UPI Provider<span class="required">*</span></label>
-                  <select name="bulkUpiProvider" id="bulkUpiProvider">
-                    <option value="">Select...</option>
-                    <option value="GPay">GPay</option>
-                    <option value="PhonePe">PhonePe</option>
-                    <option value="Paytm">Paytm</option>
-                    <option value="Others">Others</option>
-                  </select>
-                </div>
-                <div>
-                  <label>Bank<span class="required">*</span></label>
-                  <select name="bulkUpiBankName" id="bulkUpiBankName">
-                    <option value="">Select...</option>
-                    <option value="SBI 1234">SBI 1234</option>
-                    <option value="HDFC 4563">HDFC 4563</option>
-                    <option value="ICICI 7890">ICICI 7890</option>
-                    <option value="Axis 1122">Axis 1122</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
-              <div class="row">
-                <div>
-                  <label>Card Type<span class="required">*</span></label>
-                  <select name="bulkUpiCardType" id="bulkUpiCardType">
-                    <option value="">Select...</option>
-                    <option value="Credit">Credit</option>
-                    <option value="Debit">Debit</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <label>
-              Purchase Date (for all)
-              <span class="info-icon">i
-                <span class="tooltip">
-                  This date will be used for all bulk items.<br /><br />
-                  If left empty, today's date will be used and stored as:<br />
-                  <strong>1, Jan, 2026</strong>
-                </span>
-              </span>
-            </label>
-            <input type="date" name="bulkPurchaseDate" />
-
-            <div class="section-title">Bulk Items</div>
-
-            <div class="bulk-header-row">
-              <div>Item<span class="required">*</span></div>
-              <div>Category<span class="required">*</span></div>
-              <div>Amount<span class="required">*</span></div>
-              <div>Remarks</div>
-              <div></div>
-            </div>
-
-            <div id="bulkRows"></div>
-
-            <button type="button" id="addBulkRowBtn" class="add-row-btn">
-              + Add another expense
-            </button>
-          </div>
+      <!-- ================= EXPENSE SECTION ================= -->
+      <div id="expenseWrapper">
+        <!-- Single vs Bulk toggle -->
+        <div class="section-title">Mode</div>
+        <div class="toggle-group" id="modeToggle">
+          <div class="toggle-option active" data-mode="single">Single</div>
+          <div class="toggle-option" data-mode="bulk">Bulk</div>
         </div>
 
-        <!-- ================= INCOME SECTION ================= -->
-        <div id="incomeSection" class="hidden">
-          <div class="section-title">Income</div>
+        <!-- SINGLE EXPENSE SECTION -->
+        <div id="singleSection">
+          <label>Item<span class="required">*</span></label>
+          <input type="text" name="item" placeholder="Coffee, Uber, Swiggy..." />
 
-          <label>Income Source<span class="required">*</span></label>
-          <select name="incomeSource" id="incomeSource">
+          <label>Category<span class="required">*</span></label>
+          <select name="category" id="category">
             <option value="">Select...</option>
-            <option value="Company (Zensar) Salary">
-              Company (Zensar) Salary
-            </option>
+            <option value="Bills">Bills</option>
+            <option value="Subscriptions">Subscriptions</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Food & Drink">Food & Drink</option>
+            <option value="Groceries">Groceries</option>
+            <option value="Health & Wellbeing">Health & Wellbeing</option>
             <option value="Other">Other</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Transport">Transport</option>
+            <option value="Travel">Travel</option>
+            <option value="Business">Business</option>
+            <option value="Gifts">Gifts</option>
           </select>
 
-          <label>Income Amount<span class="required">*</span></label>
-          <input
-            type="text"
-            id="incomeAmountDisplay"
-            placeholder="1,234"
-          />
-          <input
-            type="hidden"
-            name="incomeAmount"
-            id="incomeAmount"
-          />
+          <label>Amount<span class="required">*</span></label>
+          <input type="text" id="amountDisplay" placeholder="1,234" />
+          <input type="hidden" name="amount" id="amount" />
+
+          <label>Payment Mode<span class="required">*</span></label>
+          <select name="paymentMode" id="paymentMode">
+            <option value="">Select...</option>
+            <option value="Cash">Cash</option>
+            <option value="Card">Card</option>
+            <option value="UPI">UPI</option>
+          </select>
+
+          <div id="cardFields" class="hidden">
+            <div class="row">
+              <div>
+                <label>Card Type<span class="required">*</span></label>
+                <select name="cardType" id="cardType">
+                  <option value="">Select...</option>
+                  <option value="Credit">Credit</option>
+                  <option value="Debit">Debit</option>
+                </select>
+              </div>
+              <div>
+                <label>Bank<span class="required">*</span></label>
+                <select name="cardBankName" id="cardBankName">
+                  <option value="">Select...</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="upiFields" class="hidden">
+            <div class="row">
+              <div>
+                <label>UPI Provider<span class="required">*</span></label>
+                <select name="upiProvider" id="upiProvider">
+                  <option value="">Select...</option>
+                  <option value="GPay">GPay</option>
+                  <option value="PhonePe">PhonePe</option>
+                  <option value="Paytm">Paytm</option>
+                  <option value="Others">Others</option>
+                </select>
+              </div>
+              <div>
+                <label>Bank<span class="required">*</span></label>
+                <select name="upiBankName" id="upiBankName">
+                  <option value="">Select...</option>
+                  <option value="SBI 1234">SBI 1234</option>
+                  <option value="HDFC 4563">HDFC 4563</option>
+                  <option value="ICICI 7890">ICICI 7890</option>
+                  <option value="Axis 1122">Axis 1122</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label>Card Type<span class="required">*</span></label>
+                <select name="upiCardType" id="upiCardType">
+                  <option value="">Select...</option>
+                  <option value="Credit">Credit</option>
+                  <option value="Debit">Debit</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
           <label>
-            Income Date
+            Purchase Date
             <span class="info-icon">i
               <span class="tooltip">
-                If empty, today's date will be used and stored as:<br />
+                This is the date when money was debited.<br /><br />
+                If you leave it empty, it will use today's date (same as
+                timestamp date) and store it as:<br />
                 <strong>1, Jan, 2026</strong>
               </span>
             </span>
           </label>
-          <input type="date" name="incomeDate" id="incomeDate" />
+          <input type="date" name="purchaseDate" />
+
+          <label>Remarks</label>
+          <input type="text" name="remarks" placeholder="Optional notes..." />
+        </div>
+
+        <!-- BULK EXPENSE SECTION -->
+        <div id="bulkSection" class="hidden">
+          <div class="section-title">Bulk Common Fields</div>
+
+          <label>Payment Mode<span class="required">*</span></label>
+          <select name="bulkPaymentMode" id="bulkPaymentMode">
+            <option value="">Select...</option>
+            <option value="Cash">Cash</option>
+            <option value="Card">Card</option>
+            <option value="UPI">UPI</option>
+          </select>
+
+          <div id="bulkCardFields" class="hidden">
+            <div class="row">
+              <div>
+                <label>Card Type<span class="required">*</span></label>
+                <select name="bulkCardType" id="bulkCardType">
+                  <option value="">Select...</option>
+                  <option value="Credit">Credit</option>
+                  <option value="Debit">Debit</option>
+                </select>
+              </div>
+              <div>
+                <label>Bank<span class="required">*</span></label>
+                <select name="bulkCardBankName" id="bulkCardBankName">
+                  <option value="">Select...</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="bulkUpiFields" class="hidden">
+            <div class="row">
+              <div>
+                <label>UPI Provider<span class="required">*</span></label>
+                <select name="bulkUpiProvider" id="bulkUpiProvider">
+                  <option value="">Select...</option>
+                  <option value="GPay">GPay</option>
+                  <option value="PhonePe">PhonePe</option>
+                  <option value="Paytm">Paytm</option>
+                  <option value="Others">Others</option>
+                </select>
+              </div>
+              <div>
+                <label>Bank<span class="required">*</span></label>
+                <select name="bulkUpiBankName" id="bulkUpiBankName">
+                  <option value="">Select...</option>
+                  <option value="SBI 1234">SBI 1234</option>
+                  <option value="HDFC 4563">HDFC 4563</option>
+                  <option value="ICICI 7890">ICICI 7890</option>
+                  <option value="Axis 1122">Axis 1122</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <label>Card Type<span class="required">*</span></label>
+                <select name="bulkUpiCardType" id="bulkUpiCardType">
+                  <option value="">Select...</option>
+                  <option value="Credit">Credit</option>
+                  <option value="Debit">Debit</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
           <label>
-            Payslip (PDF)
+            Purchase Date (for all)
             <span class="info-icon">i
               <span class="tooltip">
-                Optional. Upload a PDF payslip. A download link will be stored in
-                the Income sheet.
+                This date will be used for all bulk items.<br /><br />
+                If left empty, today's date will be used and stored as:<br />
+                <strong>1, Jan, 2026</strong>
               </span>
             </span>
           </label>
-          <input type="file" name="payslip" id="payslip" accept="application/pdf" />
+          <input type="date" name="bulkPurchaseDate" />
+
+          <div class="section-title">Bulk Items</div>
+
+          <div class="bulk-header-row">
+            <div>Item<span class="required">*</span></div>
+            <div>Category<span class="required">*</span></div>
+            <div>Amount<span class="required">*</span></div>
+            <div>Remarks</div>
+            <div></div>
+          </div>
+
+          <div id="bulkRows"></div>
+
+          <button type="button" id="addBulkRowBtn" class="add-row-btn">
+            + Add another expense
+          </button>
         </div>
+      </div>
 
-        <button type="submit" id="submitBtn">Save</button>
-      </form>
-    </div>
+      <!-- ================= INCOME SECTION ================= -->
+      <div id="incomeSection" class="hidden">
+        <div class="section-title">Income</div>
 
-    <div id="toast" class="toast"></div>
+        <label>Income Source<span class="required">*</span></label>
+        <select name="incomeSource" id="incomeSource">
+          <option value="">Select...</option>
+          <option value="Company (Zensar) Salary">
+            Company (Zensar) Salary
+          </option>
+          <option value="Other">Other</option>
+        </select>
 
-    <script src="{{ url_for('static', filename='app.js') }}"></script>
-  </body>
+        <label>Income Amount<span class="required">*</span></label>
+        <input type="text" id="incomeAmountDisplay" placeholder="1,234" />
+        <input type="hidden" name="incomeAmount" id="incomeAmount" />
+
+        <label>
+          Income Date
+          <span class="info-icon">i
+            <span class="tooltip">
+              If empty, today's date will be used and stored as:<br />
+              <strong>1, Jan, 2026</strong>
+            </span>
+          </span>
+        </label>
+        <input type="date" name="incomeDate" id="incomeDate" />
+
+        <label>
+          Payslip (PDF)
+          <span class="info-icon">i
+            <span class="tooltip">
+              Optional. Upload a PDF payslip. A download link will be stored in
+              the Income sheet.
+            </span>
+          </span>
+        </label>
+        <input type="file" name="payslip" id="payslip" accept="application/pdf" />
+      </div>
+
+      <button type="submit" id="submitBtn">Save</button>
+    </form>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+
 </html>

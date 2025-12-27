@@ -244,3 +244,46 @@ input[type="date"] {
   font-size: 0.8rem;
 }
 
+.nav-btn {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+  padding: 10px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.nav-btn:hover {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-btn {
+  padding: 6px 14px;
+  border-radius: 12px;
+  background: #111827;
+  border: 1px solid #374151;
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.nav-btn:hover {
+  border-color: #22c55e;
+  color: #22c55e;
+}

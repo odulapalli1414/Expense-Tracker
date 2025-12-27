@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Records</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='records.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- TOP BAR -->
+        <div class="top-bar">
+            <div>
+                <h1>My Records</h1>
+                <span class="subtitle">View, edit or delete your entries</span>
+            </div>
+            <div class="nav-actions">
+                <a href="/" class="btn secondary">⬅ Back</a>
+                <a href="/" class="btn primary">➕ Add Entry</a>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs">
+            <button class="tab active" data-type="expenses">Expenses</button>
+            <button class="tab" data-type="income">Income</button>
+        </div>
+
+        <div id="table"></div>
+    </div>
+
+    <div id="table"></div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="overlay" class="overlay hidden">
+        <div class="modal">
+            <h2 id="modalTitle"></h2>
+            <div id="modalBody"></div>
+            <div class="modal-actions">
+                <button id="saveBtn" class="primary hidden">Save</button>
+                <button onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='records.js') }}"></script>
+</body>
+
+</html>
