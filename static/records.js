@@ -27,6 +27,55 @@ function formatDate(dateStr) {
   return `${days[d.getDay()]}, ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+// Custom modal
+function showModal(title, message, type = 'info', onConfirm = null) {
+  const modal = document.createElement('div');
+  modal.className = 'custom-modal-overlay';
+  
+  const iconMap = {
+    'info': '💡',
+    'success': '✅',
+    'warning': '⚠️',
+    'error': '❌',
+    'confirm': '❓'
+  };
+  
+  const icon = iconMap[type] || '💡';
+  
+  modal.innerHTML = `
+    <div class="custom-modal ${type}">
+      <div class="custom-modal-icon">${icon}</div>
+      <h3 class="custom-modal-title">${title}</h3>
+      <p class="custom-modal-message">${message}</p>
+      <div class="custom-modal-buttons">
+        ${onConfirm ? '<button class="modal-btn confirm-btn" id="confirmBtn">Confirm</button>' : ''}
+        <button class="modal-btn cancel-btn" id="cancelBtn">${onConfirm ? 'Cancel' : 'OK'}</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  setTimeout(() => modal.classList.add('show'), 10);
+  
+  const confirmBtn = modal.querySelector('#confirmBtn');
+  const cancelBtn = modal.querySelector('#cancelBtn');
+  
+  const closeModal = () => {
+    modal.classList.remove('show');
+    setTimeout(() => document.body.removeChild(modal), 300);
+  };
+  
+  if (confirmBtn) {
+    confirmBtn.onclick = () => {
+      closeModal();
+      if (onConfirm) onConfirm();
+    };
+  }
+  
+  cancelBtn.onclick = closeModal;
+}
+
 async function load() {
   const res = await fetch(`/api/${currentType}`);
   dataCache = await res.json();
@@ -34,14 +83,14 @@ async function load() {
   let html = "<table><tr>";
 
   if (currentType === "expenses") {
-    html += "<th>Item</th><th>Amount</th><th>Payment</th><th>Date</th><th>Actions</th>";
+    html += "<th>#</th><th>Item</th><th>Amount</th><th>Payment</th><th>Date</th><th>Actions</th>";
   } else {
-    html += "<th>Source</th><th>Amount</th><th>Date</th><th>Actions</th>";
+    html += "<th>#</th><th>Source</th><th>Amount</th><th>Date</th><th>Payslip</th><th>Actions</th>";
   }
 
   html += "</tr>";
 
-  dataCache.forEach(r => {
+  dataCache.forEach((r, index) => {
     html += "<tr>";
 
     if (currentType === "expenses") {
@@ -51,24 +100,31 @@ async function load() {
       }
 
       html += `
+        <td class="index-cell">${index + 1}</td>
         <td>${r.item}</td>
         <td>₹${r.amount}</td>
         <td>${payment}</td>
         <td>${formatDate(r.purchase_date)}</td>
       `;
     } else {
+      const payslipBtn = r.payslip_url 
+        ? `<a href="${r.payslip_url}" target="_blank" download class="download-btn">📥 Download</a>`
+        : '<span style="color:#6b7280">—</span>';
+      
       html += `
+        <td class="index-cell">${index + 1}</td>
         <td>${r.source}</td>
         <td>₹${r.amount}</td>
         <td>${formatDate(r.income_date)}</td>
+        <td>${payslipBtn}</td>
       `;
     }
 
     html += `
       <td class="actions">
-        <button onclick="view(${r.id})" class="action-btn view-btn">👁</button>
-        <button onclick="edit(${r.id})" class="action-btn edit-btn">✏️</button>
-        <button onclick="del(${r.id})" class="action-btn delete-btn">🗑</button>
+        <button onclick="view(${r.id})" class="action-btn view-btn" title="View Details">👁</button>
+        <button onclick="edit(${r.id})" class="action-btn edit-btn" title="Edit Entry">✏️</button>
+        <button onclick="del(${r.id})" class="action-btn delete-btn" title="Delete Entry">🗑</button>
       </td>
     </tr>`;
   });
@@ -86,12 +142,16 @@ function view(id) {
   
   if (currentType === "expenses") {
     content += `<p><b>Item:</b> ${r.item}</p>`;
+    content += `<p><b>Category:</b> ${r.category || 'N/A'}</p>`;
     content += `<p><b>Payment:</b> ${r.payment_mode}${r.bank_name ? " (" + r.bank_name + ")" : ""}</p>`;
     content += `<p><b>Date:</b> ${formatDate(r.purchase_date)}</p>`;
     if (r.remarks) content += `<p><b>Remarks:</b> ${r.remarks}</p>`;
   } else {
     content += `<p><b>Source:</b> ${r.source}</p>`;
     content += `<p><b>Date:</b> ${formatDate(r.income_date)}</p>`;
+    if (r.payslip_url) {
+      content += `<p><b>Payslip:</b> <a href="${r.payslip_url}" target="_blank" download class="download-btn-modal">📥 Download PDF</a></p>`;
+    }
   }
 
   modalBody.innerHTML = content;
@@ -166,7 +226,6 @@ function edit(id) {
       <input id="editRemarks" placeholder="Remarks" value="${r.remarks || ''}">
     `;
 
-    // Setup payment mode change handler
     const paymentModeSelect = document.getElementById("editPaymentMode");
     const cardFields = document.getElementById("editCardFields");
     const upiFields = document.getElementById("editUpiFields");
@@ -212,10 +271,8 @@ function edit(id) {
     paymentModeSelect.addEventListener("change", updatePaymentFields);
     cardTypeSelect.addEventListener("change", updateCardBanks);
 
-    // Initialize the fields based on current payment mode
     updatePaymentFields();
 
-    // Pre-select UPI values if applicable
     if (r.payment_mode === "UPI") {
       document.getElementById("editUpiProvider").value = r.upi_provider || "";
       document.getElementById("editUpiBank").value = r.bank_name || "";
@@ -223,7 +280,6 @@ function edit(id) {
     }
 
   } else {
-    // Income edit
     modalBody.innerHTML = `
       <label>Source</label>
       <input id="editItem" placeholder="Source" value="${r.source || ''}">
@@ -263,20 +319,36 @@ async function save() {
     }
   }
 
-  await fetch(`/api/${currentType}/${editId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+  try {
+    await fetch(`/api/${currentType}/${editId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
 
-  closeModal();
-  load();
+    closeModal();
+    showModal('Success!', 'Entry updated successfully', 'success');
+    load();
+  } catch (error) {
+    showModal('Error', 'Failed to update entry', 'error');
+  }
 }
 
 async function del(id) {
-  if (!confirm("Delete this entry?")) return;
-  await fetch(`/api/${currentType}/${id}`, { method: "DELETE" });
-  load();
+  showModal(
+    'Confirm Deletion',
+    'Are you sure you want to delete this entry? This action cannot be undone.',
+    'confirm',
+    async () => {
+      try {
+        await fetch(`/api/${currentType}/${id}`, { method: "DELETE" });
+        showModal('Deleted!', 'Entry deleted successfully', 'success');
+        load();
+      } catch (error) {
+        showModal('Error', 'Failed to delete entry', 'error');
+      }
+    }
+  );
 }
 
 function closeModal() {

@@ -68,8 +68,8 @@ th {
 }
 
 .action-btn {
-  background:#111827;
-  border:1px solid #374151;
+  background:#e5e7eb;
+  border:1px solid #9ca3af;
   cursor:pointer;
   width:36px;
   height:36px;
@@ -87,17 +87,28 @@ th {
 
 .view-btn:hover {
   border-color:#3b82f6;
-  background:#1e3a8a;
+  background:#3b82f6;
 }
 
 .edit-btn:hover {
   border-color:#22c55e;
-  background:#064e3b;
+  background:#22c55e;
 }
 
 .delete-btn:hover {
   border-color:#ef4444;
-  background:#7f1d1d;
+  background:#ef4444;
+}
+
+.download-link {
+  color:#3b82f6;
+  text-decoration:none;
+  font-size:0.85rem;
+  font-weight:500;
+}
+
+.download-link:hover {
+  text-decoration:underline;
 }
 
 .overlay {

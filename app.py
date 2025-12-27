@@ -227,6 +227,7 @@ def api_expenses():
                 SELECT 
                   id,
                   item,
+                  category,
                   amount,
                   purchase_date,
                   payment_mode,
@@ -328,4 +329,4 @@ def update_income(id):
         conn.close()
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

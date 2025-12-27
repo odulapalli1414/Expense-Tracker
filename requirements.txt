@@ -8,3 +8,6 @@ Werkzeug
 tzdata
 gunicorn
 mysql-connector-python
+PyMySQL
+python-dotenv
+Flask
