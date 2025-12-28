@@ -232,3 +232,100 @@ th {
   border:1px solid #374151;
   color:#e5e7eb;
 }
+
+/* ===== CUSTOM MODAL (POPUP) ===== */
+
+.custom-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.custom-modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.custom-modal {
+  background: linear-gradient(135deg, #020617, #0f172a);
+  border-radius: 18px;
+  padding: 26px 24px;
+  width: 90%;
+  max-width: 420px;
+  text-align: center;
+  border: 1px solid #334155;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+  animation: modalPop 0.3s ease;
+}
+
+@keyframes modalPop {
+  from {
+    transform: scale(0.9) translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.custom-modal-icon {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.custom-modal-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #e5e7eb;
+}
+
+.custom-modal-message {
+  margin: 12px 0 22px;
+  font-size: 0.9rem;
+  color: #9ca3af;
+  line-height: 1.5;
+}
+
+.custom-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.modal-btn {
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.confirm-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.confirm-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+.cancel-btn {
+  background: #1e293b;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+}
+
+.cancel-btn:hover {
+  background: #334155;
+}

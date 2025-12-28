@@ -124,6 +124,40 @@ function formatCurrency(amount) {
     });
 }
 
+// Download CSV function - Downloads both expenses and income as separate files
+function downloadExcel() {
+    const monthSelect = document.getElementById("monthFilter");
+    const yearSelect = document.getElementById("yearFilter");
+    
+    const month = monthSelect.value;
+    const year = yearSelect.value;
+
+    // Download expenses CSV
+    const expensesUrl = `/export/csv/expenses?month=${month}&year=${year}`;
+    const expensesLink = document.createElement('a');
+    expensesLink.href = expensesUrl;
+    expensesLink.style.display = 'none';
+    document.body.appendChild(expensesLink);
+    expensesLink.click();
+    document.body.removeChild(expensesLink);
+
+    // Download income CSV after a short delay
+    setTimeout(() => {
+        const incomeUrl = `/export/csv/income?month=${month}&year=${year}`;
+        const incomeLink = document.createElement('a');
+        incomeLink.href = incomeUrl;
+        incomeLink.style.display = 'none';
+        document.body.appendChild(incomeLink);
+        incomeLink.click();
+        document.body.removeChild(incomeLink);
+    }, 500);
+}
+
+// Simple modal function
+function showModal(title, message) {
+    alert(`${title}\n\n${message}`);
+}
+
 // Update summary cards
 function updateSummaryCards() {
     const totalIncome = filteredIncome.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);

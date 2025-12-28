@@ -26,14 +26,21 @@
         <!-- FILTERS -->
         <div class="filters-section">
             <div class="filter-group">
-                <label>Filter by:</label>
                 <select id="monthFilter" class="filter-select">
                     <option value="all">All Months</option>
                 </select>
+
                 <select id="yearFilter" class="filter-select">
                     <option value="all">All Years</option>
                 </select>
-                <button id="resetFilter" class="btn-reset">🔄 Reset</button>
+
+                <button class="btn-download" onclick="downloadExcel()">
+                    ⬇ Download CSVs
+                </button>
+
+                <button id="resetFilter" class="btn-reset">
+                    <span class="reset-icon">🔄</span> Reset
+                </button>
             </div>
         </div>
 

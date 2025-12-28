@@ -1,8 +1,10 @@
 import os
-from flask import Flask, request, jsonify, render_template, send_from_directory
+from flask import Flask, request, jsonify, render_template, send_from_directory, Response
 from datetime import datetime, timedelta, timezone
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+import io
+import csv
 
 import psycopg2
 import psycopg2.extras
@@ -268,5 +270,157 @@ def delete_income(id):
     finally:
         conn.close()
 
+# ================== Download CSV (Expenses) ==================
+@app.route("/export/csv/expenses")
+def export_csv_expenses():
+    month_param = request.args.get("month", "all")
+    year_param = request.args.get("year", "all")
+
+    conn = get_db()
+    try:
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Build WHERE clause based on filters
+        expenses_where = []
+        expenses_params = []
+        
+        if month_param != "all":
+            month = int(month_param)
+            expenses_where.append("EXTRACT(MONTH FROM purchase_date)=%s")
+            expenses_params.append(month)
+        
+        if year_param != "all":
+            year = int(year_param)
+            expenses_where.append("EXTRACT(YEAR FROM purchase_date)=%s")
+            expenses_params.append(year)
+        
+        expenses_query = "SELECT purchase_date, item, category, amount, payment_mode, card_type, bank_name, upi_provider, remarks FROM expenses"
+        if expenses_where:
+            expenses_query += " WHERE " + " AND ".join(expenses_where)
+        expenses_query += " ORDER BY purchase_date"
+        
+        # Write Expenses Headers
+        writer.writerow([
+            'Date', 'Item', 'Category', 'Amount',
+            'Payment Mode', 'Card Type', 'Bank', 'UPI Provider', 'Remarks'
+        ])
+
+        with conn.cursor() as c:
+            c.execute(expenses_query, expenses_params)
+            for r in c.fetchall():
+                writer.writerow([
+                    r["purchase_date"],
+                    r["item"],
+                    r["category"],
+                    r["amount"],
+                    r["payment_mode"],
+                    r["card_type"] or "",
+                    r["bank_name"] or "",
+                    r["upi_provider"] or "",
+                    r["remarks"] or ""
+                ])
+
+        # Generate filename based on filters
+        if month_param != "all" and year_param != "all":
+            month_names = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December']
+            month_name = month_names[int(month_param)]
+            filename = f"Expenses_{year_param}_{month_name}.csv"
+        elif month_param != "all":
+            month_names = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December']
+            month_name = month_names[int(month_param)]
+            filename = f"Expenses_AllYears_{month_name}.csv"
+        elif year_param != "all":
+            filename = f"Expenses_{year_param}_AllMonths.csv"
+        else:
+            filename = f"Expenses_All_Data.csv"
+
+        # Return CSV
+        output.seek(0)
+        return Response(
+            output.getvalue(),
+            mimetype="text/csv",
+            headers={"Content-Disposition": f"attachment;filename={filename}"}
+        )
+
+    finally:
+        conn.close()
+
+
+# ================== Download CSV (Income) ==================
+@app.route("/export/csv/income")
+def export_csv_income():
+    month_param = request.args.get("month", "all")
+    year_param = request.args.get("year", "all")
+
+    conn = get_db()
+    try:
+        # Create CSV in memory
+        output = io.StringIO()
+        writer = csv.writer(output)
+        
+        # Build WHERE clause based on filters
+        income_where = []
+        income_params = []
+        
+        if month_param != "all":
+            month = int(month_param)
+            income_where.append("EXTRACT(MONTH FROM income_date)=%s")
+            income_params.append(month)
+        
+        if year_param != "all":
+            year = int(year_param)
+            income_where.append("EXTRACT(YEAR FROM income_date)=%s")
+            income_params.append(year)
+        
+        income_query = "SELECT income_date, source, amount, payslip_url FROM income"
+        if income_where:
+            income_query += " WHERE " + " AND ".join(income_where)
+        income_query += " ORDER BY income_date"
+        
+        # Write Income Headers
+        writer.writerow(['Date', 'Source', 'Amount', 'Payslip URL'])
+
+        with conn.cursor() as c:
+            c.execute(income_query, income_params)
+            for r in c.fetchall():
+                writer.writerow([
+                    r["income_date"],
+                    r["source"],
+                    r["amount"],
+                    r["payslip_url"] or ""
+                ])
+
+        # Generate filename based on filters
+        if month_param != "all" and year_param != "all":
+            month_names = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December']
+            month_name = month_names[int(month_param)]
+            filename = f"Income_{year_param}_{month_name}.csv"
+        elif month_param != "all":
+            month_names = ['January', 'February', 'March', 'April', 'May', 'June',
+                          'July', 'August', 'September', 'October', 'November', 'December']
+            month_name = month_names[int(month_param)]
+            filename = f"Income_AllYears_{month_name}.csv"
+        elif year_param != "all":
+            filename = f"Income_{year_param}_AllMonths.csv"
+        else:
+            filename = f"Income_All_Data.csv"
+
+        # Return CSV
+        output.seek(0)
+        return Response(
+            output.getvalue(),
+            mimetype="text/csv",
+            headers={"Content-Disposition": f"attachment;filename={filename}"}
+        )
+
+    finally:
+        conn.close()
+
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
